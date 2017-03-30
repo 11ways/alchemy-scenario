@@ -1,0 +1,15 @@
+{
+	"name": "alchemy-scenario",
+	"description": "The scenario plugin for Alchemy",
+	"version": "0.4.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/skerit/alchemy-scenario.git"
+	},
+	"dependencies": {},
+	"optionalDependencies": {},
+	"license": "MIT",
+	"engines": {
+		"node": "~4.5.0"
+	}
+}
