@@ -1,0 +1,46 @@
+<% implement('layouts/chimera') %>
+<% style(['element/scenario', 'chimera/scenario']) %>
+
+<% start('chimera-status') %>
+<% end('chimera-status') %>
+
+<% start('chimera-cage') %>
+<x-panel class="devices table-panel">
+	<x-panel-body>
+		<table class="table table-hover">
+			<thead><tr>
+				<th>Name</th>
+				<th>Actions</th>
+			</tr></thead>
+			<% for (i = 0; i < records.length; i++) {
+				record = records[i];
+				scenario = record.Scenario;
+			%>
+				<tr>
+					<td><%= scenario.name %></td>
+					<td>
+					<% Router.printRoute('chimera@IdActionLink', {
+						controller: 'Scenario',
+						action: 'edit',
+						id: scenario._id
+					}, {
+						className: 'btn btn-success',
+						title: 'Edit',
+						content: 'Edit'
+					}) %>
+					</td>
+				</tr>
+			<% } %>
+		</table>
+	</x-panel-body>
+</x-panel>
+
+<% Router.printRoute('chimera@ActionLink', {
+	controller: 'Scenario',
+	action: 'create'
+}, {
+	className: 'btn btn-success',
+	title: 'Add',
+	content: 'Add'
+}) %>
+<% end('chimera-cage') %>
