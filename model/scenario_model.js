@@ -11,11 +11,11 @@ var all_blocks = alchemy.getClassGroup('scenario_block'),
  * @since    0.1.0
  * @version  0.1.0
  */
-var Scenario = Model.extend(function ScenarioModel(options) {
+var Scenario = Function.inherits('Alchemy.Model', function Scenario(options) {
 
 	var that = this;
 
-	ScenarioModel.super.call(this, options);
+	Scenario.super.call(this, options);
 
 	// Update triggers when saving
 	this.on('saving', function savingRecord(data, options, creating) {

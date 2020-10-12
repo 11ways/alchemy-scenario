@@ -9,8 +9,8 @@ var all_actions = alchemy.getClassGroup('scenario_action');
  * @since    0.1.0
  * @version  0.1.0
  */
-var Action = Model.extend(function ScenarioActionModel(options) {
-	ScenarioActionModel.super.call(this, options);
+var Action = Function.inherits('Alchemy.Model', function ScenarioAction(options) {
+	ScenarioAction.super.call(this, options);
 });
 
 /**
@@ -29,7 +29,7 @@ Action.constitute(function addFields() {
 	this.addField('payload', 'Object');
 
 	// From which event this came
-	this.belongsTo('FromEvent', 'Event');
+	this.belongsTo('FromEvent', 'ScenarioEvent');
 
 	// From which scenario this came
 	this.belongsTo('FromScenario', 'Scenario');
