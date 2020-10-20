@@ -1,4 +1,4 @@
-var all_blocks = alchemy.getClassGroup('scenario_block'),
+let all_components = alchemy.getClassGroup('scenario_component'),
     all_events = alchemy.getClassGroup('scenario_event'),
     persisted  = {};
 
@@ -19,6 +19,8 @@ var Scenario = Function.inherits('Alchemy.Model', function Scenario(options) {
 
 	// Update triggers when saving
 	this.on('saving', function savingRecord(data, options, creating) {
+
+		return;
 
 		var document,
 		    blocks,
@@ -51,33 +53,49 @@ var Scenario = Function.inherits('Alchemy.Model', function Scenario(options) {
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.1.0
- * @version  0.1.0
+ * @version  0.2.0
  */
 Scenario.constitute(function addFields() {
 
-	var block_schema = new Classes.Alchemy.Schema();
+	let components = new Classes.Alchemy.Schema(this);
 
-	// Each scenario is created by 1 user
+	// Each scenario belongs to a user
 	this.belongsTo('User');
 
 	// The name of the scenario
 	this.addField('name', 'String');
 
-	block_schema.addField('id', 'ObjectId', {default: alchemy.ObjectId});
-	block_schema.addField('type', 'Enum', {values: all_blocks});
-	block_schema.addField('top', 'Number');
-	block_schema.addField('left', 'Number');
-	block_schema.addField('out_on_true', 'ObjectId', {array: true});
-	block_schema.addField('out_on_false', 'ObjectId', {array: true});
+	components.addField('uid', 'ObjectId', {default: alchemy.ObjectId});
+	components.addField('type', 'Enum', {values: all_components});
 
-	// Another schema in the schema
-	block_schema.addField('settings', 'Schema', {schema: 'type'});
+	let connections = new Classes.Alchemy.Schema();
+	let connection = new Classes.Alchemy.Schema();
+	let anchor = new Classes.Alchemy.Schema();
+	anchor.addField('node_uid', 'ObjectId');
+	anchor.addField('anchor_name', 'String');
+
+	connection.addField('source', JSON.clone(anchor));
+	connection.addField('target', JSON.clone(anchor));
+
+	connections.addField('in', JSON.clone(connection), {array: true});
+	connections.addField('out', JSON.clone(connection), {array: true});
+
+	components.addField('connections', connections);
+
+	let pos = new Classes.Alchemy.Schema();
+	pos.addField('x', 'Number');
+	pos.addField('y', 'Number');
+
+	components.addField('pos', pos);
+
+	// Component-specific settings (depends on the "type" property)
+	components.addField('settings', 'Schema', {schema: 'type'});
 
 	// All the blocks of this scenario
-	this.addField('blocks', 'Schema', {array: true, schema: block_schema});
+	this.addField('components', components, {array: true});
 
 	// The events that trigger this scenario
-	this.addField('triggers', 'Enum', {array: true, values: {all_events}});
+	//this.addField('triggers', 'Enum', {array: true, values: {all_events}});
 
 	// Is this scenario enabled?
 	this.addField('enabled', 'Boolean', {default: false});
@@ -112,7 +130,7 @@ Scenario.constitute(function chimeraConfig() {
 	edit.addField('name');
 	edit.addField('user_id');
 	edit.addField('enabled');
-	edit.addField('blocks');
+	edit.addField('components');
 });
 
 /**
@@ -125,20 +143,100 @@ Scenario.constitute(function chimeraConfig() {
 Scenario.setDocumentProperty('scope_name', 'default');
 
 /**
- * Get block by its id
+ * Get a component by its id
  *
- * @author   Jelle De Loecker <jelle@develry.be>
+ * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.1.0
- * @version  0.1.0
+ * @version  0.2.0
+ *
+ * @param    {String|ObjectID}   uid
+ *
+ * @return   {Alchemy.Scenario.Component.Component}
  */
-Scenario.setDocumentMethod(function getBlock(id) {
+Scenario.setDocumentMethod(function getComponent(uid) {
 
-	// Get all blocks
-	var blocks = this.getSortedBlocks();
+	if (!uid || !this.components || !this.components.length) {
+		return false;
+	}
 
-	// Return by its id
-	return blocks.all[id];
+	let components = this.getComponents();
+
+	return components.by_id[uid] || false;
 });
+
+/**
+ * Initiate the components for this session
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.1.0
+ * @version  0.2.0
+ *
+ * @return   {Object}
+ */
+Scenario.setDocumentMethod(function getComponents(session) {
+
+	let result = {
+		list  : [],
+		by_id : {}
+	};
+
+	if (!session) {
+		session = new Classes.Alchemy.Scenario.Session(this);
+	}
+
+	if (!this.components || !this.components.length) {
+		return result;
+	}
+
+	let constructor,
+	    component,
+	    entry;
+
+	for (entry of this.components) {
+		constructor = all_components[entry.type];
+
+		if (!constructor) {
+			throw new Error('Unable to find component type "' + entry.type + '"');
+		}
+
+		component = new constructor(session, entry);
+
+		result.list.push(component);
+		result.by_id[entry.uid] = component;
+	}
+
+	session.components = result;
+
+	return result;
+});
+
+/**
+ * Do a simple start
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ *
+ * @return   {Object}
+ */
+Scenario.setDocumentMethod(async function start() {
+
+	let components = this.getComponents(),
+	    component,
+	    tasks = [];
+
+	for (component of components.list) {
+		if (component.constructor.type_name == 'start') {
+			tasks.push(component.start());
+		}
+	}
+
+	await Pledge.all(tasks);
+});
+
+/**
+ * Old code
+ */
 
 /**
  * Get a block's description
@@ -156,65 +254,6 @@ Scenario.setDocumentMethod(function getBlockDescription(id, callback) {
 	}
 
 	block.getDescription(callback);
-});
-
-/**
- * Sort blocks
- *
- * @author   Jelle De Loecker <jelle@develry.be>
- * @since    0.1.0
- * @version  0.1.0
- */
-Scenario.setDocumentMethod(function getSortedBlocks() {
-
-	var result,
-	    block,
-	    data,
-	    i;
-
-	if (this.sorted_blocks) {
-		return this.sorted_blocks;
-	}
-
-	result = {
-		// Start blocks
-		start : [],
-		// All blocks
-		all   : {}
-	};
-
-	if (!this.blocks) {
-		console.log('No blocks found for', this);
-		return result;
-	}
-
-	for (i = 0; i < this.blocks.length; i++) {
-		data = this.blocks[i];
-
-		if (!all_blocks[data.type]) {
-			console.error('Could not create block', data.type, data);
-			continue;
-		}
-
-		// Create the block instance
-		block = new all_blocks[data.type](this, data);
-
-		// Set the block index
-		block.index = i;
-
-
-		// Entrance blocks should be added to the start array
-		if (block.entrance_point) {
-			result.start.push(block);
-		}
-
-		// All blocks should be saved under their ids
-		result.all[block.id] = block;
-	}
-
-	this.sorted_blocks = result;
-
-	return result;
 });
 
 /**

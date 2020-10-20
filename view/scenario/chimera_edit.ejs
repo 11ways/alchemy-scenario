@@ -1,12 +1,10 @@
 <%
 implement('layouts/chimera');
 
-record = scenario[0].Scenario;
-
 Router.setBreadcrumb([
 	{title: __('chimera', 'Dashboard'), route: 'chimera@Dashboard'},
 	{title: 'Scenario', route: 'chimera@ActionLink', parameters: {controller: 'scenario', action: 'index'}},
-	{title: record.name || record._id, route: 'chimera@IdActionLink', parameters: {controller: 'scenario'}}
+	{title: scenario.name || scenario._id, route: 'chimera@IdActionLink', parameters: {controller: 'scenario'}}
 ]);
 
 start('chimera-status');
@@ -16,5 +14,9 @@ style(['element/scenario', 'chimera/scenario']);
 script('chimera/scenario_editor');
 
 start('chimera-cage') %>
-Editing scenario ...
+<alchemy-scenario
+	scenario-id={% scenario._id %}
+	#components={% components %}
+	#value={% scenario %}
+></alchemy-scenario>
 <% end('chimera-cage') %>

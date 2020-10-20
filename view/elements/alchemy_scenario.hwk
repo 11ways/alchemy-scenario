@@ -1,0 +1,6 @@
+<div class="scenariobuttons"></div>
+<fv-grid></fv-grid>
+<fv-list
+	!Route="Scenario#components"
+	#component_data={% self.components %}
+></fv-list>

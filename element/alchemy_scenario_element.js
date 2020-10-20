@@ -5,94 +5,151 @@
  * @since    0.1.0
  * @version  0.1.0
  */
-var Scenario = Function.inherits('Hawkejs.Element', function AlchemyScenario() {
+var Scenario = Function.inherits('Alchemy.Element', function AlchemyScenario() {
 	AlchemyScenario.super.call(this);
-
-	// Get a jsPlumb istance
-	this.jsPlumb = jsPlumb.getInstance();
-
-	// Get the scenario buttons div
-	this.buttons_element = this.grab('div', 'scenariobuttons');
 });
 
 /**
- * Set the scenario record
+ * The template to use for the content of this element
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ */
+Scenario.setTemplateFile('elements/alchemy_scenario');
+
+/**
+ * The stylesheet to load for this element
  *
  * @author   Jelle De Loecker <jelle@develry.be>
  * @since    0.1.0
  * @version  0.1.0
  */
-Scenario.setProperty('default_block_options', {
-	type   : 'conditional',
-	class  : '',
-	top    : 60,
-	left   : 100
-});
+Scenario.setStylesheetFile('element/scenario');
 
 /**
- * Set the block info
+ * Component data
  *
- * @author   Jelle De Loecker <jelle@develry.be>
+ * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.1.0
  * @version  0.1.0
  */
-Scenario.setMethod(function setBlockInfo(all_blocks) {
+Scenario.setAssignedProperty('components', null, function setComponents(value) {
+	return value;
+});
+
+/**
+ * Buttons wrapper
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ */
+Scenario.addElementGetter('buttons_element', '.scenariobuttons');
+
+/**
+ * Fv-Grid element
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ */
+Scenario.addElementGetter('grid_element', 'fv-grid');
+
+/**
+ * The record id
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ */
+Scenario.setAttribute('scenario-id');
+
+/**
+ * Get/set the value
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ */
+Scenario.setProperty(function value() {
+	return this.grid_element.value;
+}, function setValue(value) {
+
+	if (this.grid_element) {
+		this.grid_element.value = value;
+	}
+
+	this.assigned_data.value = value;
+});
+
+/**
+ * Load the configuration GUI of a node
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ *
+ * @param    {FV-Node}   fv_node
+ */
+Scenario.setStatic(async function configureNode(fv_node) {
+
+	let schema = fv_node.assigned_data.config.schema,
+	    scenario = fv_node.queryParents('alchemy-scenario');
+
+	let component_data = scenario.assigned_data.value.getComponent(fv_node.uid),
+	    settings = null;
+
+	if (component_data) {
+		settings = component_data.settings;
+	}
+
+	if (!settings) {
+		settings = {};
+	}
+
+	let variables = {
+		schema              : schema,
+		component_settings  : settings,
+	};
+
+	await hawkejs.scene.render('scenario/component_config', variables);
+
+	let dialog = document.querySelector('he-dialog.component-config-dialog');
+
+	dialog.afterRender(function appeared() {
+
+		let wrapper = dialog.querySelector('.component-config-wrapper');
+		let form = wrapper.querySelector('.main-form');
+		let apply = wrapper.querySelector('.btn-apply');
+
+		apply.addEventListener('click', function onClick(e) {
+
+			let value = form.value;
+
+			component_data.settings = value;
+		});
+	});
+});
+
+/**
+ * Set the buttons
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.1.0
+ * @version  0.2.0
+ */
+Scenario.setMethod(function setButtons() {
 
 	var that = this,
-	    select,
-	    option,
-	    block,
 	    save,
 	    key;
 
-	this.all_blocks = all_blocks;
-
 	// Empty out the scenariobuttons
-	this.buttons_element.innerHTML = '';
-
-	// Create a new select
-	select = Hawkejs.createElement('select');
-
-	// Set the class
-	select.classList.add('blocklist');
-
-	// Add the empty option
-	option = Hawkejs.createElement('option');
-	option.setAttribute('value', '');
-	option.innerText = ' -- Add new block --';
-	select.appendChild(option);
-
-	// Iterate over all the block types
-	for (key in all_blocks) {
-		block = all_blocks[key];
-
-		// Create a new option
-		option = Hawkejs.createElement('option');
-
-		// Set the option value
-		option.setAttribute('value', key);
-
-		// Set the option content
-		option.innerText = block.title
-
-		// Add the new option to the select
-		select.appendChild(option);
-	}
-
-	// When the value of the select changes, a block needs to be added
-	select.addEventListener('change', function changed(e) {
-
-		var value = this.value;
-
-		if (value) {
-			that.addBlock(value);
-		}
-
-		this.value = '';
-	});
+	Hawkejs.removeChildren(this.buttons_element);
 
 	// Create a save button
-	save = Hawkejs.createElement('button');
+	save = this.createElement('button');
 	save.innerText = 'Save';
 	save.classList.add('btn');
 	save.classList.add('btn-success');
@@ -103,11 +160,20 @@ Scenario.setMethod(function setBlockInfo(all_blocks) {
 		that.save();
 	});
 
-	// Add the select to the buttons element
-	this.buttons_element.appendChild(select);
+	let start = this.createElement('button');
+	start.innerText = 'Start';
+	start.classList.add('btn');
+	start.classList.add('btn-primary');
+
+	// Listen for the start click
+	start.addEventListener('click', function onClick(e) {
+		e.preventDefault();
+		that.start();
+	});
 
 	// Add the save button
 	this.buttons_element.appendChild(save);
+	this.buttons_element.appendChild(start);
 });
 
 /**
@@ -128,20 +194,66 @@ Scenario.setMethod(function save(callback) {
 	config = {
 		controller: 'Scenario',
 		action: 'save',
-		id: this.id
+		id: this.scenario_id
+	};
+
+	// Construct the url to save to
+	url = hawkejs.scene.helpers.Router.routeUrl('chimera@IdActionLink', config);
+
+	let components = this.grid_element.value,
+	    component,
+	    entry;
+
+	for (component of components) {
+
+		for (entry of this.assigned_data.value.components) {
+			if (entry.uid == component.uid) {
+				component.settings = entry.settings;
+				break;
+			}
+		}
+	}
+
+	// Get the data
+	data = {
+		components: components,
+	};
+
+	hawkejs.scene.fetch(url, {post: {scenario: data}}, function gotResponse(err, res) {
+		if (err) {
+			return console.error('Failed to save:', err);
+		}
+	});
+});
+
+/**
+ * Start this scenario
+ *
+ * @author   Jelle De Loecker <jelle@develry.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ */
+Scenario.setMethod(function start() {
+
+	var config,
+	    data,
+	    url;
+
+	config = {
+		controller: 'Scenario',
+		action: 'start',
+		id: this.scenario_id
 	};
 
 	// Construct the url to save to
 	url = hawkejs.scene.helpers.Router.routeUrl('chimera@IdActionLink', config);
 
 	// Get the data
-	data = {
-		blocks: this.getBlockData()
-	};
+	data = {};
 
 	hawkejs.scene.fetch(url, {post: {scenario: data}}, function gotResponse(err, res) {
 		if (err) {
-			return console.error('Failed to save:', err);
+			return console.error('Failed to start:', err);
 		}
 	});
 });
@@ -168,46 +280,6 @@ Scenario.setMethod(function getBlocks() {
  */
 Scenario.setMethod(function getBlock(id) {
 	return document.getElementById(id);
-});
-
-/**
- * Get block date
- *
- * @author   Jelle De Loecker <jelle@develry.be>
- * @since    0.1.0
- * @version  0.1.0
- */
-Scenario.setMethod(function getBlockData() {
-
-	var blocks = this.getBlocks(),
-	    result = [],
-	    block,
-	    data,
-	    i;
-
-	// Iterate over all the blocks
-	for (i = 0; i < blocks.length; i++) {
-		block = blocks[i];
-
-		// Ignore removed blocks
-		if (block.removed) {
-			continue;
-		}
-
-		data = {
-			id           : block.id,
-			type         : block.type,
-			out_on_true  : block.getExitIds(true),
-			out_on_false : block.getExitIds(false),
-			settings     : block.options.settings || {},
-			left         : parseInt(block.style.left),
-			top          : parseInt(block.style.top)
-		};
-
-		result.push(data);
-	}
-
-	return result;
 });
 
 /**
@@ -259,61 +331,26 @@ Scenario.setMethod(function setRecord(record) {
 });
 
 /**
- * Add a block element to the scenario
+ * Added to the DOM for the first time
  *
- * @author   Jelle De Loecker <jelle@develry.be>
- * @since    0.1.0
- * @version  0.1.0
- *
- * @param    {String}   type     The type of block to add
- * @param    {Object}   options  The options for this block
- *
- * @return   {ScenarioBlockElement}
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
  */
-Scenario.setMethod(function addBlock(type, options) {
+Scenario.setMethod(function introduced() {
+	this.setButtons();
 
-	var block;
-
-	if (typeof type == 'object') {
-		options = type;
-		type = options.type;
+	if (this.assigned_data.value) {
+		if (this.assigned_data.value._id) {
+			this.grid_element.grid_id = this.assigned_data.value._id;
+		}
 	}
 
-	if (!options) {
-		options = {};
+	if (this.assigned_data.components) {
+		this.grid_element.components = this.assigned_data.components;
 	}
 
-	if (!options.type) {
-		options.type = type;
+	if (this.assigned_data.value) {
+		this.grid_element.value = this.assigned_data.value.components;
 	}
-
-	// Create the block
-	block = Hawkejs.createElement('alchemy-scenario-block');
-
-	// And set this as the parent
-	block.initialize(this, options);
-
-	return block;
-});
-
-/**
- * Register a connection
- *
- * @author   Jelle De Loecker <jelle@develry.be>
- * @since    0.1.0
- * @version  0.1.0
- */
-Scenario.setMethod(function attachConnection(info) {
-	//console.log('Attachment:', info);
-});
-
-/**
- * Detach a connection
- *
- * @author   Jelle De Loecker <jelle@develry.be>
- * @since    0.1.0
- * @version  0.1.0
- */
-Scenario.setMethod(function detachConnection(info) {
-	//console.log('Detachment:', info);
 });

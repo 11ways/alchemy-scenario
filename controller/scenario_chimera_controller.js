@@ -20,7 +20,7 @@ var Scenario = Function.inherits('Alchemy.Controller.Chimera', function Scenario
  *
  * @param    {Conduit}   conduit
  */
-Scenario.setMethod(function index(conduit) {
+Scenario.setAction(function index(conduit) {
 
 	var that = this;
 
@@ -46,7 +46,7 @@ Scenario.setMethod(function index(conduit) {
  *
  * @param    {Conduit}   conduit
  */
-Scenario.setMethod(function create(conduit) {
+Scenario.setAction(function create(conduit) {
 
 	var that = this,
 	    Scenario = this.getModel('Scenario'),
@@ -76,33 +76,32 @@ Scenario.setMethod(function create(conduit) {
 /**
  * Edit a scenario
  *
- * @author   Jelle De Loecker <jelle@develry.be>
+ * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.1.0
- * @version  0.1.0
+ * @version  0.2.0
  *
  * @param    {Conduit}   conduit
  */
-Scenario.setMethod(function edit(conduit) {
+Scenario.setAction(function edit(conduit, controller, action, scenario_id) {
 
 	var that = this,
-	    client,
-	    id = conduit.param('id');
+	    client;
 
-	if (!id) {
+	if (!scenario_id) {
 		return conduit.notFound();
 	}
 
-	this.getModel('Scenario').findById(id, function gotScenario(err, record) {
+	this.getModel('Scenario').findById(scenario_id, function gotScenario(err, record) {
 
 		if (err) {
 			return conduit.error(err);
 		}
 
-		if (!record.length) {
+		if (!record) {
 			return conduit.notFound();
 		}
 
-		that.set('all_blocks', that.getBlockInfo());
+		that.set('components', Classes.Alchemy.Scenario.Component.Component.getAll());
 		that.set('scenario', record);
 		that.render('scenario/chimera_edit');
 	});
@@ -117,7 +116,7 @@ Scenario.setMethod(function edit(conduit) {
  *
  * @param    {Conduit}   conduit
  */
-Scenario.setMethod(function save(conduit) {
+Scenario.setAction(function save(conduit) {
 
 	var that = this,
 	    scenario = conduit.body.scenario,
@@ -125,11 +124,11 @@ Scenario.setMethod(function save(conduit) {
 	    id = conduit.param('id');
 
 	if (!id) {
-		return conduit.error('No id given');
+		return conduit.error(new Error('No id given'));
 	}
 
-	if (!scenario || !scenario.blocks) {
-		return conduit.error('No blocks given to save');
+	if (!scenario || !scenario.components) {
+		return conduit.error('No scenario components given to save');
 	}
 
 	this.getModel('Scenario').findById(id, function gotScenario(err, record) {
@@ -138,17 +137,15 @@ Scenario.setMethod(function save(conduit) {
 			return conduit.error(err);
 		}
 
-		if (!record.length) {
+		if (!record) {
 			return conduit.notFound();
 		}
 
 		// Overwrite the blocks
-		record.blocks = scenario.blocks;
+		record.components = scenario.components;
 
 		// Save the record
 		record.save(function saved(err) {
-
-			console.log('Saved?', err);
 
 			if (err) {
 				return conduit.error(err);
@@ -157,6 +154,32 @@ Scenario.setMethod(function save(conduit) {
 			conduit.end({saved: true});
 		});
 	});
+});
+
+/**
+ * Start a scenario
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.2.0
+ * @version  0.2.0
+ *
+ * @param    {Conduit}   conduit
+ */
+Scenario.setAction(async function start(conduit, controller, action, scenario_id) {
+
+	if (!scenario_id) {
+		return conduit.notFound();
+	}
+
+	let scenario = await this.getModel('Scenario').findById(scenario_id);
+
+	if (!scenario) {
+		return conduit.notFound();
+	}
+
+	await scenario.start();
+
+	conduit.end();
 });
 
 /**
@@ -360,42 +383,4 @@ Scenario.setMethod(function configure_block(conduit) {
 			}
 		});
 	});
-});
-
-
-/**
- * Get block information for the client
- *
- * @author   Jelle De Loecker <jelle@develry.be>
- * @since    0.1.0
- * @version  0.1.0
- */
-Scenario.setMethod(function getBlockInfo() {
-
-	var result = {},
-	    block,
-	    proto,
-	    data,
-	    key;
-
-	for (key in all_blocks) {
-		block = all_blocks[key];
-
-		// Get the prototype
-		proto = block.prototype;
-
-		// Create the data object
-		data = {
-			entrance_point  : proto.entrance_point,
-			has_entrance    : proto.has_entrance,
-			exit_names      : proto.exit_names,
-			title           : block.title,
-			name            : key,
-			schema          : proto.schema.getDict()
-		};
-
-		result[key] = data;
-	}
-
-	return result;
 });
