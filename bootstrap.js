@@ -12,17 +12,12 @@ Router.add({
 	paths      : '/scenario/components/configure',
 });
 
-if (alchemy.plugins.chimera) {
-	// Add the dashboard to the menu deck
-	alchemy.plugins.chimera.menu.set('scenarios', {
-		title: 'Scenarios',
-		route: 'chimera@ActionLink',
-		parameters: {
-			controller: 'scenario',
-			action: 'index'
-		},
-		icon: {
-			fa: 'fas fa-puzzle-piece'
-		}
-	});
-}
+let chimera_section = Router.section('chimera', '/' + alchemy.plugins.chimera.base_path);
+
+// Editor index action
+chimera_section.add({
+	name       : 'Chimera.Scenario#index',
+	methods    : 'get',
+	paths      : '/scenario/index',
+	breadcrumb : 'chimera.scenario.index'
+});

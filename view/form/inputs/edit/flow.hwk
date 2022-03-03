@@ -1,0 +1,19 @@
+<% style('element/flow') %>
+
+{# Placeholder if, should implement! #}
+
+{% if show_schema_instead %}
+	<alchemy-field-schema
+		#alchemy_field=<% alchemy_field %>
+		#field_context=<% field_context %>
+	></alchemy-field-schema>
+{% else %}
+	<alchemy-flow
+		class="alchemy-field-value"
+		#alchemy_field=<% alchemy_field %>
+		#field_context=<% field_context %>
+		#value=<% value %>
+	></alchemy-flow>
+{% /if %}
+
+<% console.log('FLOW VAL:::::', value) %>

@@ -1,0 +1,6 @@
+<fv-grid
+	#value={% self.value.components %}
+></fv-grid>
+<fv-list
+	!Route="Scenario#components"
+></fv-list>

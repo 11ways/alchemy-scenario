@@ -1,0 +1,12 @@
+alchemy-flow {
+	display: flex;
+
+	fv-grid {
+		flex: 1 1;
+	}
+
+	fv-list {
+		flex: 0 1 auto;
+		min-width: 1rem;
+	}
+}
