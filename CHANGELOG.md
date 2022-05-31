@@ -1,3 +1,7 @@
+## 0.3.0 (WIP)
+
+* Allow adding categories to components
+
 ## 0.2.1
 
 * Update to newer Alchemy version
