@@ -1,6 +1,7 @@
 ## 0.3.0 (WIP)
 
 * Allow adding categories to components
+* Component settings update fixes
 
 ## 0.2.1
 

@@ -35,6 +35,29 @@ AlchemyFlow.setStylesheetFile('element/alchemy_flow');
 AlchemyFlow.addElementGetter('grid_element', 'fv-grid');
 
 /**
+ * The optional categories to limit the components to
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.3.0
+ * @version  0.3.0
+ */
+AlchemyFlow.setAttribute('component-category');
+
+/**
+ * The component_data
+ *
+ * @author   Jelle De Loecker <jelle@elevenways.be>
+ * @since    0.3.0
+ * @version  0.3.0
+ */
+AlchemyFlow.setProperty(function component_data() {
+
+	let result = Classes.Alchemy.Client.Scenario.Component.Component.getFvListData(this.component_category);
+
+	return result;
+});
+
+/**
  * The value property
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
@@ -117,7 +140,7 @@ AlchemyFlow.setMethod(function getComponentSettings(uid) {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.2.1
- * @version  0.2.1
+ * @version  0.3.0
  */
 AlchemyFlow.setMethod(function setComponentSettings(uid, settings) {
 
@@ -125,7 +148,18 @@ AlchemyFlow.setMethod(function setComponentSettings(uid, settings) {
 		this.component_settings = {};
 	}
 
+	// Set the new setting values in our internal memory
 	this.component_settings[uid] = settings;
+
+	// And now update the component's data settings too
+	this.getComponent(uid);
+
+	// And update the fv-node too if it exists
+	let fv_node = this.querySelector('fv-node[uid="' + uid + '"]');
+
+	if (fv_node && fv_node.config) {
+		fv_node.config.settings = settings;
+	}
 });
 
 /**
@@ -134,6 +168,8 @@ AlchemyFlow.setMethod(function setComponentSettings(uid, settings) {
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.2.1
  * @version  0.2.1
+ *
+ * @return   {Object}
  */
 AlchemyFlow.setMethod(function getComponent(uid) {
 
