@@ -10,10 +10,9 @@
 {% else %}
 	<alchemy-flow
 		class="alchemy-field-value"
+		component-category=<% alchemy_field.config.options.category %>
 		#alchemy_field=<% alchemy_field %>
 		#field_context=<% field_context %>
 		#value=<% value %>
 	></alchemy-flow>
 {% /if %}
-
-<% console.log('FLOW VAL:::::', value) %>

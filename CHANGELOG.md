@@ -2,6 +2,8 @@
 
 * Allow adding categories to components
 * Component settings update fixes
+* Add client-side component class
+* Let client-side components handle fv-node inits
 
 ## 0.2.1
 
