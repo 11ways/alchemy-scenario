@@ -7,9 +7,7 @@ var all_blocks = alchemy.getClassGroup('scenario_block');
  * @since    0.1.0
  * @version  0.1.0
  */
-var Scenario = Function.inherits('Alchemy.Controller.Chimera', function Scenario(conduit, options) {
-	Scenario.super.call(this, conduit, options);
-});
+const Scenario = Function.inherits('Alchemy.Controller.Chimera', 'Scenario');
 
 /**
  * Show all scenarios

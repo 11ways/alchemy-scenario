@@ -10,9 +10,7 @@
  * @param    {Conduit}   conduit
  * @param    {Object}    options
  */
-var Scenario = Function.inherits('Alchemy.Controller', function Scenario(conduit, options) {
-	Scenario.super.call(this, conduit, options);
-});
+const Scenario = Function.inherits('Alchemy.Controller', 'Scenario');
 
 /**
  * Return info on all components
@@ -57,19 +55,10 @@ Scenario.setAction(function configureComponent(conduit) {
 		return conduit.error(new Error('Failed to find Component type "' + type + '"'));
 	}
 
-	if (scenario_id) {
-		
-	}
-
-	console.log('Configure component:', conduit, scenario_id, node_uid);
-	console.log('»»', component);
-
 	let node_settings = {};
 
 	this.set('node_settings', node_settings);
 	this.set('schema', component.schema);
 
 	this.render('scenario/component_config');
-
-	//conduit.end();
 });
