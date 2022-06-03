@@ -1,3 +1,7 @@
+## 0.3.1 (WIP)
+
+* Fix custom anchors being removed after an update
+
 ## 0.3.0 (2022-05-31)
 
 * Allow adding categories to components

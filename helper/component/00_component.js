@@ -250,7 +250,7 @@ Component.setMethod(async function initNode() {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.3.0
- * @version  0.3.0
+ * @version  0.3.1
  */
 Component.setMethod(function loadCustomIO() {
 
@@ -261,6 +261,11 @@ Component.setMethod(function loadCustomIO() {
 	let old_inputs = this.custom_inputs,
 	    old_outputs = this.custom_outputs;
 	
+	// `_addCustomAnchor` needs to know the original anchor config,
+	// in case it still exists
+	this.old_inputs = old_inputs;
+	this.old_outputs = old_outputs;
+
 	this.custom_inputs = {};
 	this.custom_outputs = {};
 
@@ -279,6 +284,9 @@ Component.setMethod(function loadCustomIO() {
 			this.node.removeOutput(key);
 		}
 	}
+
+	this.old_inputs = null;
+	this.old_outputs = null;
 });
 
 /**
@@ -286,7 +294,7 @@ Component.setMethod(function loadCustomIO() {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.3.0
- * @version  0.3.0
+ * @version  0.3.1
  */
 Component.setMethod(function _addCustomAnchor(type, config) {
 
@@ -295,20 +303,44 @@ Component.setMethod(function _addCustomAnchor(type, config) {
 	}
 
 	const name = config.name;
-	let existing_anchor;
 
+	let existing_anchor,
+	    old_anchors,
+	    new_anchors;
+	
 	if (type == 'input') {
+		old_anchors = this.old_inputs;
+		new_anchors = this.custom_inputs;
 		existing_anchor = this.node.getInput(name);
 	} else if (type == 'output') {
+		old_anchors = this.old_outputs;
+		new_anchors = this.custom_outputs;
 		existing_anchor = this.node.getOutput(name);
 	} else {
 		// Unknown anchor type
 		return;
 	}
 
-	// Don't add an existing anchor twice
+	// If the anchor already exists, see if we can keep it
 	if (existing_anchor) {
-		return;
+
+		let old_config = old_anchors[name];
+
+		if (Object.alike(old_config, config)) {
+			if (type == 'input') {
+				this.custom_inputs[name] = this.old_inputs[name];
+			} else if (type == 'output') {
+				this.custom_outputs[name] = this.old_outputs[name];
+			}
+
+			return;
+		} else {
+			if (type == 'input') {
+				this.node.removeInput(name);
+			} else {
+				this.node.removeOutput(name);
+			}
+		}
 	}
 
 	if (!config.type) {
