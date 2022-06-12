@@ -1,6 +1,7 @@
 ## 0.3.1 (WIP)
 
 * Fix custom anchors being removed after an update
+* Fix component settings breaking serialization
 
 ## 0.3.0 (2022-05-31)
 

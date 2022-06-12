@@ -425,7 +425,7 @@ Component.setMethod(function addSchemaConfigButton() {
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.2.1
- * @version  0.3.0
+ * @version  0.3.1
  */
 Component.setMethod(async function openConfigGui() {
 
@@ -441,13 +441,14 @@ Component.setMethod(async function openConfigGui() {
 		settings = this.config.settings;
 	}
 
-	if (!settings) {
-		settings = {};
-	}
+	// Create a shallow clone of the settings
+	settings = Object.assign({}, settings);
 
 	let alchemy_field = fv_node.queryParents('alchemy-field[field-type="flow"]');
 
 	if (alchemy_field && alchemy_field.alchemy_form) {
+		// Add the root document to the settings object.
+		// We can do this because it's a shallow clone.
 		settings.root_document = alchemy_field.alchemy_form.document;
 
 		if (settings.root_document) {
