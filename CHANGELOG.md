@@ -1,3 +1,7 @@
+## 0.4.0 (WIP)
+
+* Use `al-` prefix for custom elements
+
 ## 0.3.1 (2022-06-12)
 
 * Fix custom anchors being removed after an update

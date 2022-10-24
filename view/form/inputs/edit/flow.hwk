@@ -3,16 +3,16 @@
 {# Placeholder if, should implement! #}
 
 {% if show_schema_instead %}
-	<alchemy-field-schema
+	<al-field-schema
 		#alchemy_field=<% alchemy_field %>
 		#field_context=<% field_context %>
-	></alchemy-field-schema>
+	></al-field-schema>
 {% else %}
-	<alchemy-flow
+	<al-flow
 		class="alchemy-field-value"
 		component-category=<% alchemy_field.config.options.category %>
 		#alchemy_field=<% alchemy_field %>
 		#field_context=<% field_context %>
 		#value=<% value %>
-	></alchemy-flow>
+	></al-flow>
 {% /if %}

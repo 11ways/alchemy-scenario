@@ -1,4 +1,4 @@
-alchemy.usePlugin('flowview');
+alchemy.usePlugin('@11ways/flowview');
 
 Router.add({
 	name       : 'Scenario#components',

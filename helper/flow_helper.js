@@ -14,14 +14,14 @@ const FlowHelper = Function.inherits('Alchemy.Base', 'Alchemy.Scenario', 'FlowHe
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.2.1
- * @version  0.2.1
+ * @version  0.4.0
  *
  * @param    {FV-Node}   fv_node
  */
 FlowHelper.setStatic(async function configureNode(fv_node) {
 
 	let schema = fv_node.assigned_data.config.schema,
-	    alchemy_flow = fv_node.queryParents('alchemy-flow');
+	    alchemy_flow = fv_node.queryParents('al-flow');
 
 	let component_data = alchemy_flow.getComponent(fv_node.uid),
 	    settings = null;

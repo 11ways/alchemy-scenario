@@ -14,9 +14,9 @@ style(['element/scenario', 'chimera/scenario']);
 script('chimera/scenario_editor');
 
 start('chimera-cage') %>
-<alchemy-scenario
+<al-scenario
 	scenario-id={% scenario._id %}
 	#components={% components %}
 	#value={% scenario %}
-></alchemy-scenario>
+></al-scenario>
 <% end('chimera-cage') %>

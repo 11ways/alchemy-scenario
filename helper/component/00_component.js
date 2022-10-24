@@ -425,7 +425,7 @@ Component.setMethod(function addSchemaConfigButton() {
  *
  * @author   Jelle De Loecker <jelle@elevenways.be>
  * @since    0.2.1
- * @version  0.3.1
+ * @version  0.4.0
  */
 Component.setMethod(async function openConfigGui() {
 
@@ -433,7 +433,7 @@ Component.setMethod(async function openConfigGui() {
 	      that = this;
 
 	let schema = this.constructor.schema,
-	    alchemy_flow = fv_node.queryParents('alchemy-flow');
+	    alchemy_flow = fv_node.queryParents('al-flow');
 
 	let settings = alchemy_flow.getComponentSettings(fv_node.uid);
 
@@ -444,7 +444,7 @@ Component.setMethod(async function openConfigGui() {
 	// Create a shallow clone of the settings
 	settings = Object.assign({}, settings);
 
-	let alchemy_field = fv_node.queryParents('alchemy-field[field-type="flow"]');
+	let alchemy_field = fv_node.queryParents('al-field[field-type="flow"]');
 
 	if (alchemy_field && alchemy_field.alchemy_form) {
 		// Add the root document to the settings object.

@@ -2,17 +2,17 @@
 <% addClass('component-config-dialog') %>
 
 <div class="component-config-wrapper js-he-ready-ccw">
-	<alchemy-form
+	<al-form
 		#document={% component_settings %}
 		#schema={% schema %}
 		class="main-form"
 	>
 		{% each schema as field %}
-			<alchemy-field
+			<al-field
 				field-name={% field.name %}
-			></alchemy-field>
+			></al-field>
 		{% /each %}
-	</alchemy-form>
+	</al-form>
 
 	<button class="btn btn-apply">
 		Apply

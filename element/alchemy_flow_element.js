@@ -1,5 +1,5 @@
 /**
- * The alchemy-flow input element
+ * The al-flow input element
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.2.1
@@ -100,11 +100,11 @@ AlchemyFlow.setProperty(function value() {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.2.1
- * @version  0.2.1
+ * @version  0.4.0
  */
 AlchemyFlow.setMethod(function introduced() {
 
-	let parent = this.queryUp('alchemy-field');
+	let parent = this.queryUp('al-field');
 
 	if (parent && parent.original_value) {
 		// @TODO: should happen after the components are laoded!
