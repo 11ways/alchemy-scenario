@@ -239,8 +239,14 @@ Component.setMethod(async function initNode() {
 		this.node.loadOutgoingConnections(this.config.connections.out);
 	}
 
+	let loaded_button_content = false;
+
+	if (typeof this.loadCustomButtonContent == 'function') {
+		loaded_button_content = await this.loadCustomButtonContent();
+	}
+
 	// Add the config button if there are fields in the component's config schema
-	if (this.constructor.schema.field_count) {
+	if (this.constructor.schema.field_count && loaded_button_content === false) {
 		this.addSchemaConfigButton();
 	}
 });

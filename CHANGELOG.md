@@ -1,6 +1,7 @@
 ## 0.4.0 (WIP)
 
 * Use `al-` prefix for custom elements
+* Add `Component#loadCustomButtonContent()` method support
 
 ## 0.3.1 (2022-06-12)
 
