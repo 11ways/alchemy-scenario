@@ -2,6 +2,7 @@
 
 * Use `al-` prefix for custom elements
 * Add `Component#loadCustomButtonContent()` method support
+* Make `Component#refresh()` keep current connections
 
 ## 0.3.1 (2022-06-12)
 

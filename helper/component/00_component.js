@@ -173,14 +173,35 @@ Component.setProperty(function title() {
 });
 
 /**
+ * Update a setting
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.4.0
+ * @version  0.4.0
+ */
+Component.setMethod(function setSetting(name, value) {
+
+	if (!this.settings) {
+		this.settings = {};
+	}
+
+	this.settings[name] = value;
+
+	this.refresh();
+});
+
+/**
  * Refresh this component
  * (Fetch data, add custom anchors, set title, ...)
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.3.0
- * @version  0.3.0
+ * @version  0.4.0
  */
 Component.setMethod(async function refresh() {
+
+	// Get the current value of the node
+	let value = this.node.value;
 
 	// If we need to fetch any data, do so now
 	if (typeof this.loadData == 'function') {
@@ -192,6 +213,12 @@ Component.setMethod(async function refresh() {
 
 	// And refresh the title
 	this.refreshInterface();
+
+	// Restore the connections
+	if (value && value.connections) {
+		this.node.loadIncomingConnections(value.connections.in);
+		this.node.loadOutgoingConnections(value.connections.out);
+	}
 });
 
 /**
@@ -212,7 +239,7 @@ Component.setMethod(function refreshInterface() {
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.3.0
- * @version  0.3.0
+ * @version  0.4.0
  */
 Component.setMethod(async function initNode() {
 
@@ -233,7 +260,7 @@ Component.setMethod(async function initNode() {
 	// Refresh data
 	await this.refresh();
 
-	// Load the existing connections
+	// Load the initial connections
 	if (this.config.connections) {
 		this.node.loadIncomingConnections(this.config.connections.in);
 		this.node.loadOutgoingConnections(this.config.connections.out);
