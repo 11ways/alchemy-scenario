@@ -3,6 +3,7 @@
 * Use `al-` prefix for custom elements
 * Add `Component#loadCustomButtonContent()` method support
 * Make `Component#refresh()` keep current connections
+* Add `Component#throttledRefresh()` and use it in the `setSetting()` method
 
 ## 0.3.1 (2022-06-12)
 

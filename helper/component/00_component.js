@@ -187,7 +187,21 @@ Component.setMethod(function setSetting(name, value) {
 
 	this.settings[name] = value;
 
-	this.refresh();
+	this.throttledRefresh();
+});
+
+/**
+ * Throttled refresh
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.4.0
+ * @version  0.4.0
+ */
+Component.decorateMethod(Blast.Decorators.throttle({
+	immediate: true,
+	minimum_wait: 90,
+}), function throttledRefresh() {
+	return this.refresh();
 });
 
 /**
