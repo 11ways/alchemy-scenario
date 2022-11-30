@@ -14,7 +14,6 @@ const Component = Function.inherits('Alchemy.Client.Base', 'Alchemy.Client.Scena
 
 	this.node = node;
 	this.config = config;
-	this.settings = this.config.settings || {};
 
 	// Keep track of custom anchors
 	this.custom_inputs = {};
@@ -151,6 +150,46 @@ Component.setProperty('custom_inputs', null);
  * @type     {Object}
  */
 Component.setProperty('custom_outputs', null);
+
+/**
+ * Get the parent al-flow element
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.4.0
+ * @version  0.4.0
+ *
+ * @type     {AlFlow}
+ */
+Component.setProperty(function alchemy_flow() {
+	let flow = this.node.queryParents('al-flow');
+	return flow;
+});
+
+/**
+ * Get the settings
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.4.0
+ * @version  0.4.0
+ */
+Component.enforceProperty(function settings(new_value) {
+
+	if (!new_value) {
+		new_value = this.config.settings;
+
+		if (new_value) {
+			return new_value;
+		}
+	}
+
+	if (!new_value) {
+		new_value = {};
+	}
+
+	this.alchemy_flow.setComponentSettings(this.node.uid, new_value);
+
+	return new_value;
+});
 
 /**
  * Get the component title
@@ -480,7 +519,7 @@ Component.setMethod(async function openConfigGui() {
 	      that = this;
 
 	let schema = this.constructor.schema,
-	    alchemy_flow = fv_node.queryParents('al-flow');
+	    alchemy_flow = this.alchemy_flow;
 
 	let settings = alchemy_flow.getComponentSettings(fv_node.uid);
 

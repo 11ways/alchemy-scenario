@@ -4,6 +4,7 @@
 * Add `Component#loadCustomButtonContent()` method support
 * Make `Component#refresh()` keep current connections
 * Add `Component#throttledRefresh()` and use it in the `setSetting()` method
+* Turn `Component#settings` property into an enforced getter/setter
 
 ## 0.3.1 (2022-06-12)
 
