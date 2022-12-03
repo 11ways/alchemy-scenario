@@ -20,9 +20,6 @@ const FlowField = Function.inherits('Alchemy.Field.Schema', function Flow(schema
 	// Always clone using `toHawkejs` methods because otherwise schemas go missing
 	options.schema = JSON.clone(FlowField.schema, 'toHawkejs');
 
-	console.log('CLONED:', options.schema)
-
-
 	Flow.super.call(this, schema, name, options);
 });
 

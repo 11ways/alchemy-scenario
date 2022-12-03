@@ -1,5 +1,3 @@
-<% style('element/flow') %>
-
 {# Placeholder if, should implement! #}
 
 {% if show_schema_instead %}
