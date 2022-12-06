@@ -5,6 +5,8 @@
 * Make `Component#refresh()` keep current connections
 * Add `Component#throttledRefresh()` and use it in the `setSetting()` method
 * Turn `Component#settings` property into an enforced getter/setter
+* Use chimera's stylings for the component config form
+* Add a component title & description to the top of the configuration dialog
 
 ## 0.3.1 (2022-06-12)
 

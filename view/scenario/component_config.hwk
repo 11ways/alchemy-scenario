@@ -1,7 +1,14 @@
 <% makeDialog() %>
 <% addClass('component-config-dialog') %>
+<% style('chimera/chimera') %>
 
-<div class="component-config-wrapper js-he-ready-ccw">
+<div class="component-config-wrapper js-he-ready-ccw default-form-editor">
+
+	<div class="component-heading">
+		<h2>{{ component_title }}</h2>
+		<small>{{ description }}</small>
+	</div>
+
 	<al-form
 		#document={% component_settings %}
 		#schema={% schema %}
