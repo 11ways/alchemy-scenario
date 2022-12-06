@@ -7,6 +7,8 @@
 * Turn `Component#settings` property into an enforced getter/setter
 * Use chimera's stylings for the component config form
 * Add a component title & description to the top of the configuration dialog
+* Make description & title show up in the `fv-list` element
+* Sort nodes in the `fv-list` alphabetically
 
 ## 0.3.1 (2022-06-12)
 

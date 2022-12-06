@@ -27,11 +27,11 @@ const Component = Function.inherits('Alchemy.Client.Base', 'Alchemy.Client.Scena
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.3.0
- * @version  0.3.0
+ * @version  0.4.0
  *
  * @param    {String}   component_name
  */
-Component.setStatic(function getClass(component_name) {
+Component.setStatic(function getClass(component_name, server_class) {
 
 	let class_path = 'Alchemy.Client.Scenario.Component.' + component_name;
 
@@ -46,6 +46,10 @@ Component.setStatic(function getClass(component_name) {
 		let parent_path = 'Alchemy.Client.Scenario.Component';
 
 		ComponentClass = Function.inherits(parent_path, constructor);
+	}
+
+	if (server_class) {
+		ComponentClass.loadConfig(server_class);
 	}
 
 	return ComponentClass;
@@ -90,11 +94,36 @@ Component.setStatic(function getConstructorsOfCategory(categories) {
 });
 
 /**
+ * Load the component config
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.4.0
+ * @version  0.4.0
+ *
+ * @param    {Object}   config
+ */
+Component.setStatic(function loadConfig(config) {
+
+	this.description = config.description;
+
+	if (Blast.isNode) {
+		return;
+	}
+
+	this.categories = config.categories;
+	this.title = config.title || this.type_name.titleize();
+	this.type_name = config.type_name;
+	this.schema = config.schema;
+	this.inputs = config.inputs;
+	this.outputs = config.outputs;
+});
+
+/**
  * Get component config data for the fv-list element
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.3.0
- * @version  0.3.0
+ * @version  0.4.0
  *
  * @param    {String|String[]}   categories
  *
@@ -108,12 +137,16 @@ Component.setStatic(function getFvListData(categories) {
 	for (let constructor of constructors) {
 
 		result.push({
-			name       : constructor.name,
-			type       : constructor.type_name,
-			categories : constructor.categories,
-			class      : constructor.getClassPath(),
+			name        : constructor.name,
+			type        : constructor.type_name,
+			categories  : constructor.categories,
+			class       : constructor.getClassPath(),
+			title       : constructor.title,
+			description : constructor.description,
 		});
 	}
+
+	result.sortByPath(1, 'title');
 
 	return result;
 });
@@ -150,6 +183,19 @@ Component.setProperty('custom_inputs', null);
  * @type     {Object}
  */
 Component.setProperty('custom_outputs', null);
+
+/**
+ * Get the description of this component
+ *
+ * @author   Jelle De Loecker   <jelle@elevenways.be>
+ * @since    0.4.0
+ * @version  0.4.0
+ *
+ * @type     {String}
+ */
+Component.setProperty(function description() {
+	return this.constructor.description || '';
+});
 
 /**
  * Get the parent al-flow element
@@ -498,8 +544,6 @@ Component.setMethod(function addSchemaConfigButton() {
 
 	button.addEventListener('click', e => {
 		e.preventDefault();
-
-		console.log('Clicked on', this);
 		this.openConfigGui();
 	});
 
@@ -542,9 +586,19 @@ Component.setMethod(async function openConfigGui() {
 		}
 	}
 
+	let title = this.constructor.title;
+
+	if (this.title) {
+		if (this.title != title) {
+			title += ': "' + this.title + '"';
+		}
+	}
+
 	let variables = {
 		schema              : schema,
 		component_settings  : settings,
+		component_title     : title,
+		description         : this.description,
 	};
 
 	await hawkejs.scene.render('scenario/component_config', variables);
@@ -582,11 +636,7 @@ if (Blast.isBrowser) {
 		for (let name in component_info) {
 			let info = component_info[name];
 			let ComponentClass = Component.getClass(name);
-			ComponentClass.schema = info.schema;
-			ComponentClass.categories = info.categories;
-			ComponentClass.type_name = info.type_name;
-			ComponentClass.inputs = info.inputs;
-			ComponentClass.outputs = info.outputs;
+			ComponentClass.loadConfig(info);
 		}
 	});
 }
