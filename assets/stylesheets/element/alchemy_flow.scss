@@ -10,3 +10,48 @@ al-flow {
 		min-width: 1rem;
 	}
 }
+
+.component-config-wrapper {
+	min-width: 50vw;
+
+	.btn.btn-apply {
+		margin-top: 1rem;
+	}
+
+	al-field {
+		margin-top: 1rem;
+
+		al-label {
+			background-color: lightgray;
+			--color-title: #444;
+
+		}
+	}
+}
+
+[data-he-template="scenario/component_config"].he-dialog-contents {
+	background-color: lightslategrey;
+
+	.component-heading {
+		margin-bottom: 1.5rem;
+
+		h2 {
+			margin-bottom: 0;
+		}
+	}
+
+	al-field[field-type="query_builder"] {
+		[data-he-name="field"] > .field {
+			padding: 0;
+
+			al-query-builder {
+				padding: 0rem;
+
+				> al-query-builder-group {
+					padding: 2rem 1rem;
+					margin: 0;
+				}
+			}
+		}
+	}
+}
