@@ -328,9 +328,7 @@ Component.setMethod(async function refresh() {
  * @version  0.3.0
  */
 Component.setMethod(function refreshInterface() {
-
 	this.node.title_element.textContent = this.title;
-
 });
 
 /**
@@ -375,6 +373,8 @@ Component.setMethod(async function initNode() {
 	if (this.constructor.schema.field_count && loaded_button_content === false) {
 		this.addSchemaConfigButton();
 	}
+
+	this.refreshInterface();
 });
 
 /**
