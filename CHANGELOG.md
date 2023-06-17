@@ -1,4 +1,4 @@
-## 0.4.0 (WIP)
+## 0.4.0 (2023-06-17)
 
 * Use `al-` prefix for custom elements
 * Add `Component#loadCustomButtonContent()` method support

@@ -7,7 +7,7 @@
 		"url": "https://github.com/skerit/alchemy-scenario.git"
 	},
 	"dependencies": {
-		"@11ways/flowview": "~0.1.1"
+		"@11ways/flowview": "~0.1.2"
 	},
 	"optionalDependencies": {},
 	"license": "MIT",
