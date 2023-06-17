@@ -9,7 +9,7 @@ let all_components = alchemy.getClassGroup('scenario_component'),
  *
  * @author   Jelle De Loecker   <jelle@elevenways.be>
  * @since    0.2.1
- * @version  0.2.1
+ * @version  0.4.0
  */
 const FlowField = Function.inherits('Alchemy.Field.Schema', function Flow(schema, name, options) {
 
@@ -18,7 +18,9 @@ const FlowField = Function.inherits('Alchemy.Field.Schema', function Flow(schema
 	}
 
 	// Always clone using `toHawkejs` methods because otherwise schemas go missing
-	options.schema = JSON.clone(FlowField.schema, 'toHawkejs');
+	if (!options.schema) {
+		options.schema = FlowField.schema.clone();
+	}
 
 	Flow.super.call(this, schema, name, options);
 });
@@ -31,8 +33,6 @@ const FlowField = Function.inherits('Alchemy.Field.Schema', function Flow(schema
  * @version  0.2.1
  */
 FlowField.constitute(function createSchema() {
-
-	console.log('Doing FlowField createSchema');
 
 	let components = alchemy.createSchema();
 
