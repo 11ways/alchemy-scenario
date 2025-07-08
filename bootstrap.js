@@ -12,7 +12,11 @@ Router.add({
 	paths      : '/scenario/components/configure',
 });
 
-let chimera_section = Router.section('chimera', '/' + alchemy.plugins.chimera.base_path);
+let chimera_section = Router.subSections['chimera'];
+
+if (!chimera_section) {
+	return;
+}
 
 // Editor index action
 chimera_section.add({

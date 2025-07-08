@@ -39,13 +39,9 @@ Component.setStatic(function getClass(component_name, server_class) {
 
 	if (!ComponentClass) {
 
-		let constructor = Function.create(component_name, function ComponentConstructor(node, config) {
-			ComponentConstructor.wrapper.super.apply(this, arguments);
-		});
-
 		let parent_path = 'Alchemy.Client.Scenario.Component';
 
-		ComponentClass = Function.inherits(parent_path, constructor);
+		ComponentClass = Function.inherits(parent_path, component_name);
 	}
 
 	if (server_class) {
@@ -111,8 +107,10 @@ Component.setStatic(function loadConfig(config) {
 	}
 
 	this.categories = config.categories;
-	this.title = config.title || this.type_name.titleize();
-	this.type_name = config.type_name;
+
+	this.setStatic('title', config.title || this.type_name.titleize(), false);
+	this.setStatic('type_name', config.type_name, false);
+
 	this.schema = config.schema;
 	this.inputs = config.inputs;
 	this.outputs = config.outputs;

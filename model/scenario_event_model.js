@@ -9,9 +9,7 @@ var all_events = alchemy.getClassGroup('scenario_event');
  * @since    0.1.0
  * @version  0.1.0
  */
-var Event = Function.inherits('Alchemy.Model', function ScenarioEvent(options) {
-	ScenarioEvent.super.call(this, options);
-});
+var Event = Function.inherits('Alchemy.Model', 'ScenarioEvent');
 
 /**
  * Constitute the class wide schema

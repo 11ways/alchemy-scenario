@@ -1,3 +1,7 @@
+## 0.5.0 (2025-07-08)
+
+* Upgrade to Alchemy v1.4.0
+
 ## 0.4.0 (2023-06-17)
 
 * Use `al-` prefix for custom elements

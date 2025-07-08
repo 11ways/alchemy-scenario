@@ -11,42 +11,7 @@ let all_components = alchemy.getClassGroup('scenario_component'),
  * @since    0.1.0
  * @version  0.1.0
  */
-var Scenario = Function.inherits('Alchemy.Model', function Scenario(options) {
-
-	var that = this;
-
-	Scenario.super.call(this, options);
-
-	// Update triggers when saving
-	this.on('saving', function savingRecord(data, options, creating) {
-
-		return;
-
-		var document,
-		    blocks,
-		    block,
-		    key,
-		    i;
-
-		// Always reset the triggers
-		data.triggers = [];
-
-		// Create a scenario document
-		document = that.createDocument(data);
-
-		// Get all the blocks
-		blocks = document.getSortedBlocks().all;
-
-		for (key in blocks) {
-			block = blocks[key];
-
-			// Call doSavingScenario,
-			// which (by default) will call savingScenario
-			// if the block is not disabled
-			block.doSavingScenario(data, options, creating);
-		}
-	});
-});
+const Scenario = Function.inherits('Alchemy.Model', 'Scenario');
 
 /**
  * Constitute the class wide schema
